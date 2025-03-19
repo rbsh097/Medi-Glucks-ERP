@@ -12,8 +12,27 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(express.json({ limit: '25mb' }));
+app.use(express.json({ limit: '25mb' })); 
 app.use(helmet());
+const allowedOrigins = [
+  'http://localhost:5173',  
+  'https://gluckscare.com'  
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);  // Allow request
+    } else {
+      callback(new Error('Not allowed by CORS'));  // Block request
+    }
+  },
+  credentials: true,  
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Mon
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected successfully'))
